@@ -67,57 +67,58 @@ public class DownloadService extends Service {
             }
         }
     };
+    class InitThread extends Thread{
+        private FileInfo mFileInfo=null;
+
+        public InitThread(FileInfo mFileInfo) {
+            this.mFileInfo = mFileInfo;
+        }
+
+        @Override
+        public void run() {
+            HttpURLConnection conn=null;
+            RandomAccessFile raf=null;
+            try{
+                //连接网络文件
+                URL url=new URL(mFileInfo.getUrl());
+                conn=(HttpURLConnection) url.openConnection();
+                conn.setConnectTimeout(3000);
+                conn.setRequestMethod("GET");
+                int length=-1;
+                if(conn.getResponseCode()==200){
+                    //获得文件长度
+                    length=conn.getContentLength();
+                }
+                if(length<=0){
+                    return;
+                }
+                //在本地创建文件
+                File dir=new File(DOWNLOAD_PATH);
+                if(!dir.exists()){
+                    dir.mkdir();
+                }
+                File file=new File(dir,mFileInfo.getFileName());
+                raf=new RandomAccessFile(file,"rwd");//创建随机进入文件对象，实现断点续传功能
+                //设置文件长度
+                raf.setLength(length);
+                mFileInfo.setLength(length);
+                mHandler.obtainMessage(MSG_INIT,mFileInfo).sendToTarget();
+            }catch (Exception e){
+                e.printStackTrace();
+            }finally {
+                try {
+                    conn.disconnect();
+                    raf.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
 }
 
 /**
  * 进行网络操作必须在子线程中进行
  * 进行初始化子线程的操作
  */
-    class InitThread extends Thread{
-        private FileInfo mFileInfo=null;
 
-    public InitThread(FileInfo mFileInfo) {
-        this.mFileInfo = mFileInfo;
-    }
-
-    @Override
-    public void run() {
-        HttpURLConnection conn=null;
-        RandomAccessFile raf=null;
-        try{
-            //连接网络文件
-            URL url=new URL(mFileInfo.getUrl());
-            conn=(HttpURLConnection) url.openConnection();
-            conn.setConnectTimeout(3000);
-            conn.setRequestMethod("GET");
-            int length=-1;
-            if(conn.getResponseCode()==200){
-                //获得文件长度
-                length=conn.getContentLength();
-            }
-            if(length<=0){
-                return;
-            }
-            //在本地创建文件
-            File dir=new File(DOWNLOAD_PATH);
-            if(!dir.exists()){
-                dir.mkdir();
-            }
-            File file=new File(dir,mFileInfo.getFileName());
-            raf=new RandomAccessFile(file,"rwd");//创建随机进入文件对象，实现断点续传功能
-            //设置文件长度
-            raf.setLength(length);
-            mFileInfo.setLength(length);
-            mHandler.obtainMessage(MSG_INIT,mFileInfo).sendToTarget();
-        }catch (Exception e){
-            e.printStackTrace();
-        }finally {
-            try {
-                conn.disconnect();
-                raf.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
 }

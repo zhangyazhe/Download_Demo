@@ -63,7 +63,7 @@ public class DownloadTask {
                 URL url=new URL(mThreadInfo.getUrl());
                 conn=(HttpURLConnection) url.openConnection();
                 conn.setConnectTimeout(3000);
-                conn.getResponseCode("GET");
+                conn.setRequestMethod("GET");
                 //设置下载位置
                 int start=mThreadInfo.getStart()+mThreadInfo.getFinished();
                 conn.setRequestProperty("Range","bytes="+start+"-"+mThreadInfo.getEnd());
