@@ -17,25 +17,25 @@ public class ThreadDAOImpl implements ThreadDAO {
 
     private DBHelper mHelper=null;
     public ThreadDAOImpl(Context context){
-        mHelper=new DBHelper(context);
+        mHelper=DBHelper.getInstance(context);
     }
 
     @Override
-    public void insertThread(ThreadInfo threadInfo) {
+    public synchronized void insertThread(ThreadInfo threadInfo) {
         SQLiteDatabase db=mHelper.getWritableDatabase();
         db.execSQL("insert into thread_info(thread_id,url,start,end,finished) values(threadInfo.getId[],threadInfo.getUrl(),threadInfo.getStart(),threadInfo.getEnd(),threadInfo.getFinished())");
         db.close();
     }
 
     @Override
-    public void deleteThread(String url, int thread_id) {
+    public synchronized void deleteThread(String url, int thread_id) {
         SQLiteDatabase db=mHelper.getWritableDatabase();
         db.execSQL("delete from thread_info where url=url and thread_id=thread_id");
         db.close();
     }
 
     @Override
-    public void updateThread(String url, int thread_id, int finished) {
+    public synchronized void updateThread(String url, int thread_id, int finished) {
         SQLiteDatabase db=mHelper.getWritableDatabase();
         db.execSQL("update thread_info set =finished where url=url and thread_id=thread_id");
         db.close();
@@ -43,7 +43,7 @@ public class ThreadDAOImpl implements ThreadDAO {
 
     @Override
     public List<ThreadInfo> getThreads(String url) {
-        SQLiteDatabase db=mHelper.getWritableDatabase();
+        SQLiteDatabase db=mHelper.getReadableDatabase();
         List<ThreadInfo> list=new ArrayList<ThreadInfo>();
         Cursor cursor=db.rawQuery("select * from thread_info where url=?",new String[]{url});
         while(cursor.moveToNext()){
@@ -62,7 +62,7 @@ public class ThreadDAOImpl implements ThreadDAO {
 
     @Override
     public boolean isExists(String url, int thread_id) {
-        SQLiteDatabase db=mHelper.getWritableDatabase();
+        SQLiteDatabase db=mHelper.getReadableDatabase();
         Cursor cursor=db.rawQuery("select * from thread_info where url=? and thread_id=?",new String[]{url,thread_id+""});
         boolean exists=cursor.moveToNext();
         cursor.close();

@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import static com.example.services.DownloadService.DOWNLOAD_PATH;
 import static com.example.services.DownloadService.MSG_INIT;
@@ -26,9 +28,9 @@ public class DownloadService extends Service {
     public static final String ACTION_START="ACTION_START";
     public static final String ACTION_UPDATE="ACTION_UPDATE";
     public static final String ACTION_STOP="ACTION_STOP";
+    public static final String ACTION_FINISHED="ACTION_FINISHED";
     public static final int MSG_INIT=0;
-    private DownloadTask mTask=null;
-
+    private Map<Integer,DownloadTask> mTasks=new LinkedHashMap<Integer, DownloadTask>();
     public DownloadService() {
     }
 
@@ -41,8 +43,10 @@ public class DownloadService extends Service {
             new InitThread(fileInfo).start();
         }else if(ACTION_STOP.equals(intent.getAction())){
             FileInfo fileInfo=(FileInfo)intent.getSerializableExtra("fileinfo");
-            if(mTask!=null){
-                mTask.isPause=true;
+            //从集合中取出下载任务
+            DownloadTask task=mTasks.get(fileInfo.getId());
+            if(task!=null){
+                task.isPause=true;
             }
         }
         return super.onStartCommand(intent, flags, startId);
@@ -61,8 +65,10 @@ public class DownloadService extends Service {
                 case MSG_INIT:
                     FileInfo fileInfo=(FileInfo)msg.obj;
                     //启动下载任务
-                    mTask=new DownloadTask(DownloadService.this,fileInfo);
-                    mTask.download();
+                    DownloadTask task=new DownloadTask(DownloadService.this,fileInfo,3);
+                    task.download();
+                    //把下载任务添加到集合中
+                    mTasks.put(fileInfo.getId(),task);
                     break;
             }
         }
@@ -116,9 +122,5 @@ public class DownloadService extends Service {
         }
 }
 
-/**
- * 进行网络操作必须在子线程中进行
- * 进行初始化子线程的操作
- */
 
 }

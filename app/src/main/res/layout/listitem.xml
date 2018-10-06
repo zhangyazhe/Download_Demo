@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <TextView
+        android:id="@+id/tv_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/progress_bar"
+        android:layout_alignStart="@+id/progress_bar"
+        android:text="炉石传说"
+        android:textSize="23sp" />
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="332dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/bt_stop"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="-56dp"
+        android:max="100" />
+
+    <Button
+        android:id="@+id/bt_stop"
+        android:layout_width="wrap_content"
+        android:layout_height="37dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="55dp"
+        android:text=" 停止 "
+        android:textSize="15sp" />
+
+    <Button
+        android:id="@+id/bt_start"
+        android:layout_width="wrap_content"
+        android:layout_height="37dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="56dp"
+        android:layout_toStartOf="@+id/bt_stop"
+        android:text=" 开始 "
+        android:textSize="15sp" />
+
+</RelativeLayout>
