@@ -47,6 +47,9 @@ public class DownloadTask {
                 }
                 //将线程添加到线程信息集合中
                 threadInfos.add(threadInfo);
+                //向数据库插入线程信息
+                    mDao.insertThread(threadInfo);
+
             }
         }
 
@@ -74,6 +77,8 @@ public class DownloadTask {
             }
         }
         if(allFinished){
+            //删除线程信息
+            mDao.deleteThread(mFileInfo.getUrl());
             //发送广播，通知UI下载任务结束
             Intent intent=new Intent(DownloadService.ACTION_FINISHED);
             intent.putExtra("fileInfo",mFileInfo);
@@ -91,10 +96,7 @@ public class DownloadTask {
         }
 
         public void run(){
-            //向数据库插入线程信息
-            if(!mDao.isExists(mFileInfo.getUrl(),mFileInfo.getId())){
-                mDao.insertThread(mThreadInfo);
-            }
+
             HttpURLConnection conn=null;
             RandomAccessFile raf=null;
             InputStream input=null;
@@ -127,7 +129,7 @@ public class DownloadTask {
                         mFinished+=len;
                         //累加每个线程完成的进度
                         mThreadInfo.setFinished(mThreadInfo.getFinished()+len);
-                        if(System.currentTimeMillis()-time>500){
+                        if(System.currentTimeMillis()-time>1000){
                             time =System.currentTimeMillis();
                             intent.putExtra("finished",mFinished*100/mFileInfo.getLength());
                             mContext.sendBroadcast(intent);
@@ -141,8 +143,7 @@ public class DownloadTask {
                 }
                 //标识线程执行完毕
                 isFinished=true;
-                //删除线程信息
-                mDao.deleteThread(mThreadInfo.getUrl(),mThreadInfo.getId());
+
                 //检查下载任务是否都执行完毕
                 checkAllThreadsFinished();
 

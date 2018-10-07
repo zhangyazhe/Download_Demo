@@ -12,7 +12,7 @@ public interface ThreadDAO {
     //添加线程
     public void insertThread(ThreadInfo threadInfo);
     //删除线程
-    public void deleteThread(String url,int thread_id);
+    public void deleteThread(String url);
     //更新下载进度
     public void updateThread(String url,int thread_id,int finished);
     //查询文件的线程信息

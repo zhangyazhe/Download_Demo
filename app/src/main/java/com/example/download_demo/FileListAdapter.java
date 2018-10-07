@@ -53,6 +53,7 @@ public class FileListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View view, ViewGroup viewGroup) {
+        final FileInfo fileInfo=mFileList.get(position);
         ViewHolder holder=null;
         if (view == null) {
             //加载视图
@@ -63,39 +64,41 @@ public class FileListAdapter extends BaseAdapter {
             holder.bt_stop=(Button)view.findViewById(R.id.bt_stop);
             holder.tv_name=(TextView)view.findViewById(R.id.tv_name);
             holder.progress_bar=(ProgressBar) view.findViewById(R.id.progress_bar);
+            holder.tv_name.setText(fileInfo.getFileName());
+            holder.progress_bar.setMax(100);
+            holder.bt_start.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //通过intent将数据传递给DownloadService
+                    Intent intent=new Intent(mContext,DownloadService.class);
+                    intent.setAction(DownloadService.ACTION_START);
+                    intent.putExtra("fileInfo", fileInfo);//将创建的fileInfo对象传进去
+                    mContext.startService(intent);
+
+                }
+            });
+            holder.bt_stop.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //通过intent将数据传递给DownloadService
+                    Intent intent=new Intent(mContext, DownloadService.class);
+                    intent.setAction(DownloadService.ACTION_STOP);
+                    intent.putExtra("fileInfo", fileInfo);//将创建的fileInfo对象传进去
+                    mContext.startService(intent);
+
+                }
+            });
             view.setTag(holder);
         }else{
             holder=(ViewHolder)view.getTag();
         }
 
         //设置视图中的控件
-        final FileInfo fileInfo=mFileList.get(position);
-        holder.tv_name.setText(fileInfo.getFileName());
-        holder.progress_bar.setMax(100);
+
+
         holder.progress_bar.setProgress(fileInfo.getFinished());
 
-        holder.bt_start.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //通过intent将数据传递给DownloadService
-                Intent intent=new Intent(mContext,DownloadService.class);
-                intent.setAction(DownloadService.ACTION_START);
-                intent.putExtra("fileInfo", fileInfo);//将创建的fileInfo对象传进去
-                mContext.startService(intent);
 
-            }
-        });
-        holder.bt_stop.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //通过intent将数据传递给DownloadService
-                Intent intent=new Intent(mContext, DownloadService.class);
-                intent.setAction(DownloadService.ACTION_STOP);
-                intent.putExtra("fileInfo", fileInfo);//将创建的fileInfo对象传进去
-                mContext.startService(intent);
-
-            }
-        });
         return view;
     }
 

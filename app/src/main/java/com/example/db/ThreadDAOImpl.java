@@ -28,9 +28,9 @@ public class ThreadDAOImpl implements ThreadDAO {
     }
 
     @Override
-    public synchronized void deleteThread(String url, int thread_id) {
+    public synchronized void deleteThread(String url) {
         SQLiteDatabase db=mHelper.getWritableDatabase();
-        db.execSQL("delete from thread_info where url=url and thread_id=thread_id");
+        db.execSQL("delete from thread_info where url=url");
         db.close();
     }
 
